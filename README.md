@@ -23,14 +23,18 @@ each with a public page that shows how the review was done.
 
 ## Installing a skill
 
-Copy the skill's folder into the directory your agent loads skills from. For
+Copy the skill folders into the directory your agent loads skills from. For
 Claude Code, that is `~/.claude/skills/` for all your projects or
-`.claude/skills/` inside a single project:
+`.claude/skills/` inside a single project. These commands install both skills
+for all your projects:
 
 ```bash
 git clone https://github.com/lightsquares/skills.git
-cp -r skills/lightsquares-attestable-builds ~/.claude/skills/
+mkdir -p ~/.claude/skills
+cp -r skills/lightsquares-attestable-builds skills/lightsquares-dependency-canary ~/.claude/skills/
 ```
+
+To install only one skill, copy just that folder.
 
 The agent picks the skill up the next time it starts. You do not need to
 mention it by name; it is used when your request matches the skill's
