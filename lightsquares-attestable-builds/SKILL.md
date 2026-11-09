@@ -4,7 +4,7 @@ description: Set up a Git project for Light Squares Attestable Builds — run th
 license: MIT
 compatibility: Requires podman or docker for the local test and an account on app.lightsquares.dev (running your own builds is currently invite-only). No CLI is needed — the `lightsquares.toml` does the work.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: "Light Squares"
 ---
 
@@ -50,9 +50,10 @@ interactive steps.
    — the checkout is bind-mounted at `/workspace`; `build_cmd` is split on
    whitespace and exec'd directly (**no shell**: no `&&`, pipes, `$VAR`,
    globs). If `build_cmd` is omitted the image's `CMD` runs.
-4. Every path in `artifacts` (relative to the repo root, files only) is
-   hashed, uploaded, and named in the attestation. Missing paths are
-   skipped with a warning — the build still "succeeds" with nothing attested.
+4. Every path in `artifacts` (relative to the repo root, files only, at
+   most 1 GiB each) is hashed, uploaded, and named in the attestation.
+   Missing paths are skipped with a warning — the build still "succeeds"
+   with nothing attested.
 
 Network is available, so `cargo build` / `npm ci` / `go mod download` work.
 Builds are killed after 1 hour.
@@ -188,5 +189,6 @@ It links to the dashboard filtered to this repository:
 | `Too many open files`, `Failed to create directory ...`, `Failed connecting to the daemon in N retries` | The build exceeded the sandbox's open-file limit. Reduce parallelism and long-lived daemons: Gradle `--max-workers=2 --no-daemon` (and `kotlin.compiler.execution.strategy=in-process`), `make -j2`. |
 | Build stops after 1 hour | Hard timeout. Use a larger enclave, `--locked` lockfiles, skip tests in `build.sh`, or split the artifacts across builds. |
 | Works locally with docker, fails on the platform | Check for host-specific assumptions: files outside the repo, `~/.cargo` caches, Docker-only syntax (`--mount=type=cache` is fine in podman; BuildKit secrets are not), or an unpinned `FROM :latest` that moved. |
-| `402` / out of credits | Balance exhausted; visit the usage page or contact Light Squares. |
+| `Artifact size … exceeds maximum` | One artifact is larger than 1 GiB. Compress it, or split it into several artifacts. |
+| `402` / out of credits | Balance exhausted; check **Settings → Credits & usage** (`/settings/usage`) or contact Light Squares. |
 | Redirected to `/no-access` | Account lacks the Attestable Builds early-access role. |
