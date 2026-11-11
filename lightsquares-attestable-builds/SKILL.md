@@ -69,7 +69,8 @@ repo/
 └── src/ ...
 ```
 
-`lightsquares.toml` (must be at the repository root on branch `head`):
+`lightsquares.toml` (at the repository root or in a build-specific directory;
+add one file per build):
 
 ```toml
 [source]
@@ -139,10 +140,12 @@ There is no CLI yet; the web app drives the build from the committed toml.
    (`/builds/run`). Running your own builds needs the Attestable Builds
    early-access role; without it the page redirects to `/no-access` —
    request access via the site.
-3. Pick the repository: GitHub repositories (public or private) through the
+3. Click **Set up** for a GitHub repository to find and save every `lightsquares.toml`
+   in it (public or private) through the
    Light Squares GitHub App — install it on the org/repo if it is not listed;
    any other public Git URL can be added as a custom repository, where the
-   toml content is pasted and saved in the form instead.
+   toml content is pasted and saved in the form instead. Click **Find new builds**
+   after adding more TOML files to the GitHub repository, then pick a build.
 4. The form is prefilled from `lightsquares.toml`; adjust nothing unless
    the local test needed something different (then fix the toml too).
    Choose the enclave — default **SEV-SNP medium** (2 vCPU / 4 GiB; large
@@ -180,7 +183,7 @@ It links to the dashboard filtered to this repository:
 | `exec: "./build.sh": permission denied` or `not found` | Mode not committed (`git update-index --chmod=+x build.sh`), CRLF line endings (`/bin/sh^M: bad interpreter` → convert to LF), or `#!/bin/bash` in an image without bash → use `#!/bin/sh`. |
 | `build_cmd` with `&&`, `\|`, `$VAR`, `*` fails oddly | No shell is involved; move the logic into `build.sh`. |
 | Build succeeds but no artifacts / "Artifact not found" in the log | Paths are relative to the repo root and must be files written under `/workspace`; directories must be archived first. Check `ls -l <path>` after the local run. |
-| "No `lightsquares.toml` found" in the run form | File must be at the repo root on the branch set in `head`, committed and pushed. Custom (non-GitHub) repos keep the toml in the form instead. |
+| "No `lightsquares.toml` found" in the run form | Commit and push a `lightsquares.toml` in the repository root or a build-specific directory. Custom (non-GitHub) builds keep the toml in the form instead. |
 | `the lock file ... needs to be updated but --locked was passed` | Commit the lockfile (`Cargo.lock`, `package-lock.json`, `go.sum`) — pinned dependencies are what make the attestation meaningful. |
 | `git describe` / version stamping fails | `shallow = true` clones without history or tags; set `shallow = false`. |
 | Repository not listed on `/builds/run` | GitHub App not installed for that org/repo, or the OAuth grant is stale — re-authorize from the page. |
